@@ -5,9 +5,11 @@ go 1.17
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/labstack/gommon v0.3.1
+	github.com/lib/pq v1.2.0
 	github.com/neko-neko/echo-logrus/v2 v2.0.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/speps/go-hashids/v2 v2.0.1

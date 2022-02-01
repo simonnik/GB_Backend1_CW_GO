@@ -13,14 +13,14 @@ import (
 
 func (d delivery) Create(ectx echo.Context) error {
 	ectx.Logger().Info("Create")
-	newLink := &models.Link{}
+	newLink := &Link{}
 	if err := ectx.Bind(newLink); err != nil {
 		return err
 	}
 	cfg := contextUtils.GetConfig(ectx.Request().Context())
 	newLink.Token = token.GenerateToken(cfg.HashMinLength, cfg.HashSalt)
 
-	if err := d.links.Create(ectx.Request().Context(), newLink); err != nil {
+	if err := d.links.Create(ectx.Request().Context(), (*models.Link)(newLink)); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 

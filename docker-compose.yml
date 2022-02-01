@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  shortener:
+    build:
+      context: ./
+      dockerfile: build/package/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${NGINX_PORT}:8083"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:14.1
+    ports:
+      - "${PG_PORT}:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d
