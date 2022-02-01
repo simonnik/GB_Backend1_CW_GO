@@ -7,12 +7,16 @@ import (
 	"os"
 	"time"
 
+	// postgres driver
+	_ "github.com/lib/pq"
+
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
 	"github.com/neko-neko/echo-logrus/v2/log"
 	"github.com/simonnik/GB_Backend1_CW_GO/internal/app/link/delivery"
-	linkRepo "github.com/simonnik/GB_Backend1_CW_GO/internal/app/link/repository/inmemory"
+	linkRepo "github.com/simonnik/GB_Backend1_CW_GO/internal/app/link/repository/postgres"
 	linkUsecase "github.com/simonnik/GB_Backend1_CW_GO/internal/app/link/usecase"
 	"github.com/simonnik/GB_Backend1_CW_GO/internal/app/middlewares"
 	"github.com/simonnik/GB_Backend1_CW_GO/internal/config"
@@ -30,8 +34,11 @@ func App() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 	e.Use(middleware.Logger())
-
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout: time.Second * 10,
+	}))
 	configPath := flag.String("configPath", "configs/config.yml", "path yo yaml config")
+	flag.Parse()
 	cfg, err := config.BuildConfig(*configPath)
 	if err != nil {
 		e.Logger.Fatal(err)
@@ -56,11 +63,26 @@ func App() {
 
 	authMiddleware := middlewares.JWTAuthMiddleware(cfg.JWTSecret)
 
-	repository := linkRepo.New()
+	db, err := sqlx.Open(
+		"postgres",
+		fmt.Sprintf("user=%s password=%s port=%d dbname=%s sslmode=disable host=%s",
+			cfg.DBConfig.User,
+			cfg.DBConfig.Password,
+			cfg.DBConfig.Port,
+			cfg.DBConfig.DBName,
+			cfg.DBConfig.Host,
+		),
+	)
+	if err != nil {
+		e.Logger.Fatalf("failed to open db connection %v", err)
+	}
+
+	repository := linkRepo.New(db)
 	linksUsecase := linkUsecase.New(repository)
 	linksDelivery := delivery.New(linksUsecase)
 
 	e.POST("/api/create", linksDelivery.Create, authMiddleware)
+	e.GET("/:token", linksDelivery.Redirect)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", cfg.Port)))
 }

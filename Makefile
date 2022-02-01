@@ -13,9 +13,42 @@ ifndef HAS_IMPORTS
 	go install golang.org/x/tools/cmd/goimports
 endif
 
-init: bootstrap pre-commit-install
+up: docker-up
+down: docker-down
+stop: docker-stop
+start: docker-start
+restart: docker-restart
+build: docker-build
+init: bootstrap pre-commit-install create-env docker-down-clear docker-pull docker-build docker-up
 
-build: test
+create-env:
+	if [ ! -f './.env' ]; then cp ./.env.sample ./.env; else exit 0; fi;
+
+docker-up:
+	docker-compose up --detach --remove-orphans
+
+docker-down:
+	docker-compose down --remove-orphans
+
+docker-down-clear:
+	docker-compose down --volumes --remove-orphans
+
+docker-stop:
+	docker-compose stop
+
+docker-start:
+	docker-compose start
+
+docker-restart:
+	docker-compose restart
+
+docker-pull:
+	docker-compose pull
+
+docker-build:
+	docker-compose build
+
+go-build: test
 	go build -o bin/main ./cmd/main.go
 
 run:

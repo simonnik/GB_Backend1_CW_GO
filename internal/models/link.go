@@ -6,7 +6,7 @@ import (
 )
 
 type Link struct {
-	ID    int    `json:"-"`
+	ID    int64  `json:"-"`
 	Link  string `json:"link"`
 	Token string `json:"-"`
 }
