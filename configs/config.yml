@@ -4,9 +4,4 @@ log_level: debug
 port: 8083
 hash_salt: hahash
 hash_min_length: 7
-db_config:
-  host: 0.0.0.0
-  user: postgres
-  password: iniT11
-  db_name: shortener
-  port: 5432
+db_url: user=postgres password=iniT11 port=5432 dbname=shortener sslmode=disable host=0.0.0.0

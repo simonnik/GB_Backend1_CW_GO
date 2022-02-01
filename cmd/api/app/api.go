@@ -69,13 +69,7 @@ func App() {
 
 	db, err := sqlx.Open(
 		"postgres",
-		fmt.Sprintf("user=%s password=%s port=%d dbname=%s sslmode=disable host=%s",
-			cfg.DBConfig.User,
-			cfg.DBConfig.Password,
-			cfg.DBConfig.Port,
-			cfg.DBConfig.DBName,
-			cfg.DBConfig.Host,
-		),
+		cfg.DBUrl,
 	)
 	if err != nil {
 		e.Logger.Fatalf("failed to open db connection %v", err)
