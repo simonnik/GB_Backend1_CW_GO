@@ -6,6 +6,8 @@ info:
 tags:
   - name: api
     description: Endpoints using the REST API.
+  - name: html
+    description: Endpoints for rendering html.
 servers:
   - url: "{protocol}://{hostname}"
     variables:
@@ -69,14 +71,16 @@ paths:
                   - $ref: '#/components/schemas/Error'
       security:
         - apiKey: [ ]
-  /{hash}:
+  /{token}:
     get:
       summary: Retrieve saved link
       operationId: RetrieveLink
+      tags:
+        - html
       parameters:
-        - name: "hash"
+        - name: "token"
           in: "path"
-          description: "Hash of link to return"
+          description: "Token of link to return"
           required: true
           schema:
             type: integer
@@ -98,6 +102,32 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Error'
+  /html/form:
+    get:
+      summary: Form for generate short links
+      operationId: Form
+      tags:
+        - html
+      responses:
+        200:
+          description: Ok
+          content:
+            text/html:
+              schema:
+                type: string
+  /html/stat/{toke}:
+    get:
+      summary: Statistics view table
+      operationId: Table
+      tags:
+        - html
+      responses:
+        200:
+          description: Ok
+          content:
+            text/html:
+              schema:
+                type: string
 components:
   schemas:
     Error:
