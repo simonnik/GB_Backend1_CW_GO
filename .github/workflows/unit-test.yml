@@ -6,6 +6,8 @@ jobs:
     steps:
       - name: "Get go"
         uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.6'
       - name: "Checkout repository"
         uses: actions/checkout@v2
       - name: "Run unit tests"
