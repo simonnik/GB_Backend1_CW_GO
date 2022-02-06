@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html/template"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,8 +29,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 func App() {
 	e := echo.New()
+	fs := os.DirFS("web/template")
+	p, err := template.ParseFS(fs, "*.html", "*/*.html")
+	t := &Template{
+		templates: template.Must(p, err),
+	}
+	e.Renderer = t
 	// Logger
 	log.Logger().SetOutput(os.Stdout)
 	log.Logger().SetFormatter(&logrus.JSONFormatter{
@@ -77,14 +93,16 @@ func App() {
 
 	repository := linkRepo.New(db)
 	linksUsecase := linkUsecase.New(repository)
-	linksDelivery := delivery.New(linksUsecase)
+	linksDelivery := delivery.New(linksUsecase, cfg.JWTSecret)
 
 	e.POST("/api/create", linksDelivery.Create, authMiddleware)
-	e.GET("/:token", linksDelivery.Redirect)
+	e.GET("/:token", linksDelivery.Redirect).Name = "redirect"
+	e.GET("/html/form", linksDelivery.HTML)
+	e.GET("/html/stat/:token", linksDelivery.Stat).Name = "stat"
 
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", cfg.Port)); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal(err)
+			e.Logger.Fatal(err.Error())
 		}
 	}()
 

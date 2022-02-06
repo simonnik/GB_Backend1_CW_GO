@@ -9,20 +9,26 @@ import (
 )
 
 var (
-	ErrItemNotFound = errors.New("link not found")
+	ErrLinkNotFound = errors.New("link not found")
 )
 
 type Delivery interface {
 	Create(ectx echo.Context) error
 	Redirect(ectx echo.Context) error
+	Stat(ectx echo.Context) error
+	HTML(ectx echo.Context) error
 }
 
 type Usecase interface {
 	Create(ctx context.Context, link *models.Link) error
-	FindByToken(ctx context.Context, link models.Link) (*models.Link, error)
+	FindByToken(ctx context.Context, token string) (*models.Link, error)
+	FindAllByToken(ctx context.Context, token string) (models.StatList, error)
+	SaveStat(ctx context.Context, id int64, ip string) error
 }
 
 type Repository interface {
 	Create(ctx context.Context, link *models.Link) error
-	FindByToken(ctx context.Context, link models.Link) (*models.Link, error)
+	FindByToken(ctx context.Context, token string) (*models.Link, error)
+	FindAllByToken(ctx context.Context, token string) (models.StatList, error)
+	SaveStat(ctx context.Context, id int64, ip string) error
 }

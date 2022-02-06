@@ -4,27 +4,27 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/simonnik/GB_Backend1_CW_GO/internal/models"
 )
 
 func (d delivery) Redirect(ectx echo.Context) error {
 	ectx.Logger().Info("Redirect")
-	request := struct {
-		Link
-		LinkFilter
-	}{}
-	if err := ectx.Bind(&request); err != nil {
+	f := LinkFilter{}
+	if err := ectx.Bind(&f); err != nil {
 		return err
 	}
 
-	if request.LinkFilter.Token == nil {
+	if f.Token == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "link id can't be empty")
 	}
-	request.Link.Token = *request.LinkFilter.Token
 
-	link, err := d.links.FindByToken(ectx.Request().Context(), models.Link(request.Link))
+	link, err := d.links.FindByToken(ectx.Request().Context(), *f.Token)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	err = d.links.SaveStat(ectx.Request().Context(), link.ID, ectx.RealIP())
+	if err != nil {
+		ectx.Echo().Logger.Error(err)
 	}
 
 	ectx.Response().Header().Set("Cache-Control", "no-cache")

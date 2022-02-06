@@ -24,6 +24,8 @@ func (d delivery) Create(ectx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	link := strings.TrimRight(cfg.Host, "/") + "/" + newLink.Token
-	return ectx.JSON(http.StatusOK, echoDelivery.Map{"link": link})
+	host := strings.TrimRight(cfg.Host, "/")
+	link := host + ectx.Echo().Reverse("redirect", newLink.Token)
+	stat := host + ectx.Echo().Reverse("stat", newLink.Token)
+	return ectx.JSON(http.StatusOK, echoDelivery.Map{"link": link, "stat": stat})
 }
