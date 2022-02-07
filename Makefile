@@ -48,11 +48,11 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-go-build: test
-	go build -o bin/main ./cmd/main.go
+go-build: pre-commit test
+	go build -o bin/main ./cmd/api/main.go
 
 run:
-	go run ./cmd/main.go
+	go run ./cmd/api/main.go
 
 test:
 	@echo "+ $@"
