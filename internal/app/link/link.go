@@ -1,3 +1,5 @@
+/*go:generate mockgen -package mocks -destination=./mock_dinos.go -source=link.go */
+//go:generate mockgen -package=mocks -destination=mocks/mocks.go github.com/simonnik/GB_Backend1_CW_GO/internal/app/link  Delivery,Usecase,Repository
 package link
 
 import (
@@ -11,6 +13,10 @@ import (
 var (
 	ErrLinkNotFound = errors.New("link not found")
 )
+
+type Token interface {
+	Generate() string
+}
 
 type Delivery interface {
 	Create(ectx echo.Context) error

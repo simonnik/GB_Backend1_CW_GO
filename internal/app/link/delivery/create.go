@@ -8,7 +8,6 @@ import (
 	echoDelivery "github.com/simonnik/GB_Backend1_CW_GO/internal/app/echo/delivery"
 	"github.com/simonnik/GB_Backend1_CW_GO/internal/models"
 	contextUtils "github.com/simonnik/GB_Backend1_CW_GO/internal/pkg/context"
-	"github.com/simonnik/GB_Backend1_CW_GO/internal/pkg/token"
 )
 
 func (d delivery) Create(ectx echo.Context) error {
@@ -18,7 +17,7 @@ func (d delivery) Create(ectx echo.Context) error {
 		return err
 	}
 	cfg := contextUtils.GetConfig(ectx.Request().Context())
-	newLink.Token = token.GenerateToken(cfg.HashMinLength, cfg.HashSalt)
+	newLink.Token = d.token.Generate()
 
 	if err := d.links.Create(ectx.Request().Context(), (*models.Link)(newLink)); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

@@ -10,7 +10,7 @@ import (
 )
 
 func TestBuildConfigFileNotFound(t *testing.T) {
-	configFile := "../../config.yaml"
+	configFile := "../../config1.yaml"
 	c, err := BuildConfig(configFile)
 	require.Error(t, err)
 	assert.Nil(t, c)

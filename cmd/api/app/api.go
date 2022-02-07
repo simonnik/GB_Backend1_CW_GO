@@ -93,7 +93,8 @@ func App() {
 
 	repository := linkRepo.New(db)
 	linksUsecase := linkUsecase.New(repository)
-	linksDelivery := delivery.New(linksUsecase, cfg.JWTSecret)
+	token := delivery.NewToken(cfg.HashMinLength, cfg.HashSalt)
+	linksDelivery := delivery.New(linksUsecase, cfg.JWTSecret, token)
 
 	e.POST("/api/create", linksDelivery.Create, authMiddleware)
 	e.GET("/:token", linksDelivery.Redirect).Name = "redirect"

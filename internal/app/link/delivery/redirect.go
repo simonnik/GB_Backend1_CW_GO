@@ -14,7 +14,7 @@ func (d delivery) Redirect(ectx echo.Context) error {
 	}
 
 	if f.Token == nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "link id can't be empty")
+		return echo.NewHTTPError(http.StatusBadRequest, "link token can't be empty")
 	}
 
 	link, err := d.links.FindByToken(ectx.Request().Context(), *f.Token)
